@@ -6,6 +6,7 @@ const notFound = require('./middlewares/notFound')
 const errorHandler = require('./middlewares/errorHandler')
 const cors = require('cors')
 app.use(cors())
+app.use(express.json())
 app.get('/', (_, res) => {
     res.send('server in funzione')
 })

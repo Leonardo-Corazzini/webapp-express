@@ -1,11 +1,4 @@
 const connection = require('../data/db.js')
-const image = {
-    'Inception': 'inception.jpg',
-    'The Godfather': 'the_godfather.jpg',
-    'Titanic': 'titanic.jpg',
-    'The Matrix': 'matrix.jpg',
-    'Interstellar': 'interstellar.jpg'
-}
 
 function index(_, res) {
 
@@ -15,7 +8,7 @@ function index(_, res) {
     connection.query(sql, (err, movies) => {
         if (err) return res.status(500).json({ message: err.message })
         movies.forEach((movie) => {
-            movie.image = `http://localhost:3000/${image[movie.title]}`
+            movie.image = `http://localhost:3000/${movie.image}`
         })
         res.json(movies)
     })
@@ -43,7 +36,7 @@ function show(req, res) {
             })
 
         const movie = results[0]
-        movie.image = `http://localhost:3000/${image[movie.title]}`
+        movie.image = `http://localhost:3000/${movie.image}`
 
         const sql = `SELECT * FROM reviews WHERE movie_id = ?`
 
@@ -56,4 +49,17 @@ function show(req, res) {
     })
 }
 
-module.exports = { index, show }
+function storeReview(req, res) {
+    const id = req.params.id
+    const { text, vote, name } = req.body
+
+    console.log(id, text, vote, name)
+    const sql =
+        'INSERT INTO reviews (text, name, vote, movie_id) VALUES (?, ?, ?, ?)'
+
+    connection.query(sql, [text, name, vote, id], (err) => {
+        if (err) return res.status(500).json({ message: err })
+        res.status(201).json({ message: 'Review added' })
+    })
+}
+module.exports = { index, show, storeReview }
